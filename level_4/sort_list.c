@@ -28,33 +28,109 @@ int ascending(int a, int b)
 }
 */
 
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 typedef	struct		s_list
 {
 	int				data;
 	struct s_list	*next;
 }					t_list;
 
+
+void	new_list(t_list **begin, int d)
+{
+	t_list	*new;
+	t_list	*curr;
+
+	new = (t_list *)malloc(sizeof(*new));
+	if (!new)
+		return ;
+	new->data = d;
+	new->next = NULL;
+	if (*begin == NULL)
+	{
+		*begin = new;
+		return ;
+	}
+	curr = *begin;
+	while (curr->next != NULL)
+		curr = curr->next;
+	curr->next = new;
+	return ;
+}
+
+int		compare(int a, int b)
+{
+	if (a > b)
+		return (0);
+	else
+		return (1);
+}
+
+void	swap(t_list *a, t_list *b)
+{
+	int	tmp;
+
+	tmp = a->data;
+	a->data = b->data;
+	b->data = tmp;
+}
+
 t_list	*sort_list(t_list *lst, int (*cmp)(int, int))
 {
-	t_list begin;
-	t_list curr;
-	t_list tmp;
+	t_list *begin;
+	t_list *curr;
 
 	begin = lst;
+	if (!lst)
+		return (0);
 	while (lst)
 	{
 		curr = lst->next;
 		while (curr)
 		{
 			if ((*cmp)(lst->data, curr->data) == 0)
-			{
-				tmp = lst;
-				lst = curr;
-				curr = tmp;
-			}
+				swap(lst, curr);
 			curr = curr->next;
 		}
-		lst = lst->next
+		lst = lst->next;
 	}
 	return (begin);
+}
+
+void	print(t_list *start)
+{
+	t_list	*curr;
+	int i;
+
+	i = 6;
+	curr = start;
+	while (i >= 0 && curr->next != NULL)
+	{
+		printf("%d ", curr->data);
+		curr = curr->next;
+		i--;
+	}
+	printf("%d\n", curr->data);
+}
+
+int main()
+{
+	int 		a[7] = {4, 7, 1, 3, 2, 5, 6};
+	t_list	*start;
+	int i;
+
+	i = 0;
+	start = NULL;
+	while (i < 7)
+	{
+		new_list(&start, a[i]);
+		i++;
+	}
+	print(start);
+	start = sort_list(start, compare);
+	print(start);
+	return (0);
 }
