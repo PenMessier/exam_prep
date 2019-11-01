@@ -25,76 +25,118 @@ typedef struct	s_point {
 
 #endif
 
-char **tab_dup(char **tab, int h)
+char **make_area(char **zone, t_point size)
 {
+	int x;
+	int	y;
 	int i;
-	int	j;
-	char **ret;
+	int j;
+	char **area;
 
+	y = size.y;
+	x = size.x;
 	i = 0;
-	j = 0;
-	ret = (char **)malloc(sizeof(char *) * h);
-	while (i < h)
+	area = (char **)malloc(sizeof(char *) * y + 1);
+	if (!area)
+		return (0);
+	while (i < y)
 	{
-		if (i % 5 == 0)
-			j = 0;
-		ret[i] = strdup(tab[j]);
-		j++;
+		area[i] = (char *)malloc(sizeof(char) * x + 1);
+		j = 0;
+		while (j < x)
+		{
+			area[i][j] = zone[i][j];
+			j++;
+		}
+		area[i][j] = '\0';
 		i++;
 	}
-	return ret;
+	area[y] = NULL;
+	return (area);
 }
 
-void	print_tab(char **tab, int size)
+void	print_area(char **area)
 {
-	int	y;
+	int x;
+	int y;
 
 	y = 0;
-	while (y < size)
+	while (area[y])
 	{
-		printf("%s", tab[y]);
-		printf("\n");
+		x = 0;
+		while (area[y][x])
+		{
+			write(1, &area[y][x], 1);
+			write(1, " ", 1);
+			x++;
+		}
+		write(1, "\n", 1);
 		y++;
 	}
-	printf("\n");
 }
 
-void	flood(char **tab, t_point begin, t_point size, int x, int y)
+int check_point(t_point new, t_point size)
 {
-	if (x < 0 || y < 0)
-		return ;
-	if (x > size.x || y > size.y)
-		return ;
-	if (x < begin.x && y < begin.x)
-		return ;
-	//if (tab[x][y] != b)
-	//	return ;
-	tab[x][y] = 'F';
-	flood(tab, begin, size, x + 1, y);
-	flood(tab, begin, size, x - 1, y);
-	flood(tab, begin, size, x, y + 1);
-	flood(tab, begin, size, x, y - 1);
+	int x;
+	int y;
+
+	x = new.x;
+	y = new.y;
+	if (x >= 0 && y >= 0 && x < size.x && y < size.y)
+		return (1);
+	return (0);
 }
 
-void  flood_fill(char **tab, t_point size, t_point begin)
+t_point	make_point(int x, int y)
 {
-	flood(tab, begin, size, begin.x, begin.y);
+	t_point new;
+
+	new.x = x;
+	new.y = y;
+	return (new);
+}
+
+void	flood(char **area, t_point begin, t_point size, char b)
+{
+	int x;
+	int y;
+
+	x = begin.x;
+	y = size.y - 1 - begin.y;
+	if (check_point(begin, size) && area[y][x] == b)
+	{
+		area[y][x] = 'F';
+		flood(area, make_point(x + 1, begin.y), size, b);
+		flood(area, make_point(x - 1, begin.y), size, b);
+		flood(area, make_point(x, begin.y + 1), size, b);
+		flood(area, make_point(x, begin.y - 1), size, b);
+	}
+}
+
+void  flood_fill(char **area, t_point size, t_point begin)
+{
+	char b;
+
+	b = area[size.y - 1 - begin.y][begin.x];
+	flood(area, begin, size, b);
 }
 
 int	main()
 {
+	char **area;
 	t_point size = { 8, 5 };
 	t_point begin = { 2, 2 };
-	char *area[5];
-	area[0] = "11111111";
-	area[1] = "10001001";
-	area[2] = "10010001";
-	area[3] = "10010001";
-	area[4] = "11100001";
-
-	char **map = tab_dup(area, 10);
-	//print_tab(map, 10);
-	flood_fill(map, size, begin);
-	print_tab(map, 10);
+	char *zone[] = {
+		"11111111",
+		"10001001",
+		"10010001",
+		"10110001",
+		"11100001"
+	};
+	area = make_area(zone, size);
+	print_area(area);
+	write(1, "\n", 1);
+	flood_fill(area, size, begin);
+	print_area(area);
 	return (0);
 }
