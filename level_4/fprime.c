@@ -18,6 +18,8 @@ void	prime_factor(int	n)
 	int p;
 
 	p = 2;
+	if (n == 1)
+		printf("1");
 	while (n > 1 || n >= p)
 	{
 		if (n % p == 0)
