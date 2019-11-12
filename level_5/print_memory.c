@@ -61,7 +61,7 @@ void	print_memory(const void *addr, size_t size)
 				write(1, p + i + j, 1);
 			else
 				write(1, ".", 1);
-			j += 1;
+			j++;
 		}
 		write(1, "\n", 1);
 		i += 16;
