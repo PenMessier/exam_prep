@@ -144,17 +144,26 @@ int	rpn_calc(char *s, int *in, int *op, int *n, int *f)
 	a = find_number(s, in, *op, f);
 	if (*f == -1)
 		return (-1);
-	*n = calc(a, *n, s[*op]);
-	if (*n == 0 && (s[*op] == '/' || s[*op] == '%'))
+	if (*f == 1)
 	{
-		printf("check\n");
-		return (-1);
+		if (a == 0 && (s[*op] == '/' || s[*op] == '%'))
+			return (-1);
+		*n = calc(*n, a, s[*op]);
+	}
+	else
+	{
+		if (*n == 0 && (s[*op] == '/' || s[*op] == '%'))
+			return (-1);
+		*n = calc(a, *n, s[*op]);
 	}
 	*op += 1;
 	while (s[*op] && !is_oper(s[*op]))
 		*op += 1;
 	if (s[*op] && is_oper(s[*op]))
-		rpn_calc(s, in, op, n, f);
+	{
+		if (rpn_calc(s, in, op, n, f) == -1)
+			return (-1);
+	}
 	return (1);
 }
 
