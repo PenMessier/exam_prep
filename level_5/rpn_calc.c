@@ -56,12 +56,10 @@ int is_num(char *s, int *i, int *n)
 		*i += 1;
 	if (s[*i] > 47 && s[*i] < 58)
 	{
-		//printf("s[%d] = %c\n", *i, s[*i]);
 		while (s[*i] && !(is_space(s[*i])))
 			*i += 1;
 		(!s[*i]) ? *i -= 1 : 0;
 		*n += 1;
-		//printf("n = %d\n", *n);
 		return (1);
 	}
 	return (0);
@@ -133,6 +131,25 @@ int find_number(char *s, int *i, int op, int *f)
 	return (n);
 }
 
+int check_zero(char oper, int *f, int *n, int a)
+{
+	if (*f == -1)
+		return (0);
+	if (*f == 1)
+	{
+		if (a == 0 && (oper == '/' || oper == '%'))
+			return (0);
+		*n = calc(*n, a, oper);
+	}
+	else
+	{
+		if (*n == 0 && (oper == '/' || oper == '%'))
+			return (0);
+		*n = calc(a, *n, oper);
+	}
+	return (1);
+}
+
 int	rpn_calc(char *s, int *in, int *op, int *n, int *f)
 {
 	int i;
@@ -142,19 +159,16 @@ int	rpn_calc(char *s, int *in, int *op, int *n, int *f)
 	i = 0;
 	e = 0;
 	a = find_number(s, in, *op, f);
-	if (*f == -1)
+	if (!check_zero(s[*op], f, n, a))
 		return (-1);
-	*n = calc(a, *n, s[*op]);
-	if (*n == 0 && (s[*op] == '/' || s[*op] == '%'))
-	{
-		printf("check\n");
-		return (-1);
-	}
 	*op += 1;
 	while (s[*op] && !is_oper(s[*op]))
 		*op += 1;
 	if (s[*op] && is_oper(s[*op]))
-		rpn_calc(s, in, op, n, f);
+	{
+		if (rpn_calc(s, in, op, n, f) == -1)
+			return (-1);
+	}
 	return (1);
 }
 
@@ -187,7 +201,7 @@ int main(int ac, char **av)
 		n = find_number(av[1], &i, o, &f);
 		if (f == -1)
 		{
-			printf("%s\n", av[1]);
+			printf("Error\n");
 			return (0);
 		}
 		if (rpn_calc(av[1], &i, &o, &n, &f) == -1)

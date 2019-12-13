@@ -25,8 +25,10 @@ int ft_isprime(int n)
 	int i;
 
 	i = 2;
-	if (n == i)
+	if (n < i)
 		return (0);
+	if (n == 2)
+		return (1);
 	while (i < n)
 	{
 		if (!(n % i))
@@ -66,7 +68,7 @@ int main(int ac, char **av)
 	int count;
 
 	i = 1;
-	count = 1;
+	count = 0;
 	if (ac == 2)
 	{
 		if ((n = ft_atoi(av[1]))!= 0)

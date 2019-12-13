@@ -30,7 +30,7 @@ int main(void)
 {
 	char *s;
 
-	s = "\t\v   -568830asdfnk";
+	s = "\t\v   9223372036854775807";
 	printf("%d\n", ft_atoi(s));
 	printf("%d\n", atoi(s));
 	return (0);
